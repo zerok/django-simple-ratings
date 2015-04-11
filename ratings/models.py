@@ -6,12 +6,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.generic import GenericForeignKey
 from django.db import models
 from django.db.models.query import QuerySet
+from django.utils.encoding import python_2_unicode_compatible
 
 from ratings.utils import get_content_object_field, is_gfk, recommended_items
 
 from generic_aggregation import generic_annotate
 
 
+@python_2_unicode_compatible
 class RatedItemBase(models.Model):
     score = models.FloatField(default=0, db_index=True)
     user = models.ForeignKey(User, related_name='%(class)ss')
@@ -20,7 +22,7 @@ class RatedItemBase(models.Model):
     class Meta:
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s rated %s by %s" % (self.content_object, self.score,
                                        self.user)
 
@@ -32,7 +34,7 @@ class RatedItemBase(models.Model):
         content_field = get_content_object_field(self)
         related_object = getattr(self, content_field.name)
         uniq = '%s.%s' % (related_object._meta, related_object.pk)
-        return hashlib.sha1(uniq).hexdigest()
+        return hashlib.sha1(uniq.encode('utf-8')).hexdigest()
 
     @classmethod
     def lookup_kwargs(cls, instance):
@@ -168,7 +170,7 @@ class _RatingsDescriptor(models.Manager):
                     if not isinstance(obj, self.model):
                         raise TypeError("'%s' instance expected" %
                                         self.model._meta.object_name)
-                    for (k, v) in lookup_kwargs.iteritems():
+                    for (k, v) in lookup_kwargs.items():
                         setattr(obj, k, v)
                     obj.save()
             add.alters_data = True
@@ -271,6 +273,7 @@ class SimilarItemManager(models.Manager):
         return qs.order_by('-score')
 
 
+@python_2_unicode_compatible
 class SimilarItem(models.Model):
     content_type = models.ForeignKey(ContentType, related_name='similar_items')
     object_id = models.IntegerField()
@@ -286,5 +289,5 @@ class SimilarItem(models.Model):
 
     objects = SimilarItemManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%s (%s)' % (self.similar_object, self.score)

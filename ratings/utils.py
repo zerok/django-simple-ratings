@@ -206,7 +206,7 @@ def recommendations(ratings_queryset, people, person,
             sim_sums.setdefault(item.content_object, 0)
             sim_sums[item.content_object] += sim
 
-    rankings = [(total / sim_sums[pk], pk) for pk, total in totals.iteritems()]
+    rankings = [(total / sim_sums[pk], pk) for pk, total in totals.items()]
 
     rankings.sort()
     rankings.reverse()
@@ -276,7 +276,7 @@ def recommended_items(ratings_queryset, user):
             total_sim[actual] += similar_item.score
 
     rankings = [(score / total_sim[item], item)
-                for item, score in scores.iteritems()]
+                for item, score in scores.items()]
 
     rankings.sort()
     rankings.reverse()

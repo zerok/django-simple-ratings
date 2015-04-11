@@ -55,7 +55,7 @@ class RatingsTestCase(TestCase):
         # in the list or queryset
         annotated = [(item.pk, item) for item in list_or_qs]
         annotated.sort()
-        return map(lambda item_tuple: item_tuple[1], annotated)
+        return [item[1] for item in annotated]
 
     def assertQuerySetEqual(self, a, b):
         # assert list or queryset a is the same as list or queryset b
@@ -70,7 +70,7 @@ class RatingsTestCase(TestCase):
 
         # get the rating and check that it saved correctly
         item_rating = self.item1.ratings.all()[0]
-        self.assertTrue(unicode(item_rating).endswith(' rated 1.0 by john'))
+        self.assertTrue(str(item_rating).endswith(' rated 1.0 by john'))
 
         # get the rating another way and check that it works
         user_manager = getattr(self.john, self.related_name)
@@ -562,7 +562,7 @@ class RatingsTestCase(TestCase):
     def test_rated_item_model_unicode(self):
         self.john.username = u'Иван'
         rating = self.item1.ratings.rate(self.john, 1)
-        rating_unicode_string = unicode(rating)
+        rating_unicode_string = str(rating)
 
 
 class CustomModelRatingsTestCase(RatingsTestCase):
@@ -695,7 +695,7 @@ class RecommendationsTestCase(TestCase):
         self.food_b.save()
         calculate_similar_items(RatedItem.objects.all(), 10)
         top_for_food_a = self.food_a.ratings.similar_items()[0]
-        top_for_food_a_unicode_string = unicode(top_for_food_a)
+        top_for_food_a_unicode_string = str(top_for_food_a)
 
 
 class QueryHasWhereTestCase(TestCase):

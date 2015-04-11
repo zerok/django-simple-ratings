@@ -1,3 +1,4 @@
+from __future__ import print_function
 from optparse import make_option
 from django.conf import settings
 from django.core.management.base import AppCommand
@@ -45,8 +46,8 @@ class Command(AppCommand):
         from django.db.models import get_models
 
         for model in get_models(app):
-            for k, v in model.__dict__.iteritems():
+            for k, v in model.__dict__.items():
                 if isinstance(v, _RatingsDescriptor):
                     if self.verbosity > 0:
-                        print 'Updating the %s field of %s' % (k, model)
+                        print('Updating the %s field of %s' % (k, model))
                     getattr(model, k).update_similar_items()
